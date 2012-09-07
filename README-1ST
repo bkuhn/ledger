@@ -153,4 +153,4 @@ it's usually fairly obvious where things have gone astray.
       $ cd /path/to/ledger/sources
       $ env PATH=/where/you/want/cmake/installed/bin:$PATH  BOOST_ROOT=/where/you/want/boost/installed ./acprep --prefix=/where/you/want/ledger/installed --debug --python config
       $ env PATH=/where/you/want/cmake/installed/bin:$PATH  BOOST_ROOT=/where/you/want/boost/installed ./acprep --prefix=/where/you/want/ledger/installed --debug --python make
-      $ env PATH=/where/you/want/cmake/installed/bin:$PATH  BOOST_ROOT=/where/you/want/boost/installed ./acprep --prefix=/where/you/want/ledger/installed --debug --python install
+      $ env PATH=/where/you/want/cmake/installed/bin:$PATH  BOOST_ROOT=/where/you/want/boost/installed ./acprep --prefix=/where/you/want/ledger/installed --debug --python make install
