@@ -92,14 +92,20 @@ foreach my $type (keys %data) {
 foreach my $type (keys %data) {
   delete $data{$type} if scalar(keys %{$data{$type}}) == 0;
 }
+my %linesByDate;
+
 foreach my $type (keys %data) {
   print "\"SCHEDULE OF $type\"\n\"ENDING:\",\"$formattedEndDate\"\n\n",
     '"DATE","PAYEE","ACCOUNT","AMOUNT","INVOICE"', "\n";
   foreach my $invoice (keys %{$data{$type}}) {
     my $vals;
     foreach my $vals (@{$data{$type}{$invoice}{entries}}) {
-      print "\"$vals->{date}\",\"$vals->{payee}\",\"$vals->{account}\",\"\$$vals->{amount}\",\"link:$invoice\"\n";
+      $linesByDate{$vals->{date}} = "" if not defined $linesByDate{$vals->{date}};
+      $linesByDate{$vals->{date}} =  "\"$vals->{date}\",\"$vals->{payee}\",\"$vals->{account}\",\"\$$vals->{amount}\",\"link:$invoice\"\n";
     }
+  }
+  foreach my $date (sort { $a cmp $b } keys %linesByDate) {
+    print $linesByDate{$date};
   }
   print "pagebreak\n";
 }
