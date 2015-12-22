@@ -100,12 +100,13 @@ foreach my $type (keys %data) {
   foreach my $invoice (keys %{$data{$type}}) {
     my $vals;
     foreach my $vals (@{$data{$type}{$invoice}{entries}}) {
-      $linesByDate{$vals->{date}} = "" if not defined $linesByDate{$vals->{date}};
-      $linesByDate{$vals->{date}} =  "\"$vals->{date}\",\"$vals->{payee}\",\"$vals->{account}\",\"\$$vals->{amount}\",\"link:$invoice\"\n";
+      $linesByDate{$invoice} = { line => '', '__MIN_DATE__' => '9999/12/31' } if not defined $linesByDate{$invoice};
+      $linesByDate{$invoice}{line} =  "\"$vals->{date}\",\"$vals->{payee}\",\"$vals->{account}\",\"\$$vals->{amount}\",\"link:$invoice\"\n";
+      $linesByDate{$invoice}{__MIN_DATE__} = $vals->{date} if $vals->{date} lt $linesByDate{$invoice}{__MIN_DATE__};
     }
   }
-  foreach my $date (sort { $a cmp $b } keys %linesByDate) {
-    print $linesByDate{$date};
+  foreach my $invoice (sort { $linesByDate{$a}{__MIN_DATE__} cmp $linesByDate{$b}{__MIN_DATE__} } keys %linesByDate) {
+    print $linesByDate{$invoice}{line};
   }
   print "pagebreak\n";
 }
