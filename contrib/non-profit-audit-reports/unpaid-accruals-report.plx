@@ -68,7 +68,8 @@ foreach my $type (@possibleTypes) {
     or die "Unable to run $LEDGER_CMD @ledgerOptions: $!";
 
   while (my $line = <LEDGER_FUNDS>) {
-    next if $line =~ /"\<Adjustment\>"/;
+    next if $line =~ /"\<(?:Revalued|Adjustment)\>"/;
+    next if $line =~ /^\s*\.\."\s*$/;
     die "Unable to parse output line $line from @ledgerOptions"
 
       unless $line =~ /^\s*"([^"]+)","([^"]+)","([^"]+)","([^"]+)","\s*\$\s*([\-\d\.\,]+)"\s*$/;
