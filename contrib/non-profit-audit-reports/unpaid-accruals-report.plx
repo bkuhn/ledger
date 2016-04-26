@@ -92,11 +92,11 @@ foreach my $type (keys %data) {
 foreach my $type (keys %data) {
   delete $data{$type} if scalar(keys %{$data{$type}}) == 0;
 }
-my %linesByDate;
 
 foreach my $type (keys %data) {
   print "\"SCHEDULE OF $type\"\n\"ENDING:\",\"$formattedEndDate\"\n\n",
     '"DATE","PAYEE","ACCOUNT","AMOUNT","INVOICE"', "\n";
+  my %linesByDate;
   foreach my $invoice (keys %{$data{$type}}) {
     my $vals;
     foreach my $vals (@{$data{$type}{$invoice}{entries}}) {
