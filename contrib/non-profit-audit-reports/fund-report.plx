@@ -108,6 +108,7 @@ my @possibleTypes = ('Income', 'Expenses', 'Unearned Income', 'Retained Earnings
                      'Accrued:Loans Receivable', 'Accrued:Accounts Payable',
                      'Accrued:Accounts Receivable', 'Accrued:Expenses');
 
+my $haveReleasedIncome = 0;
 foreach my $type (@possibleTypes) {
   foreach my $fund (keys %funds) {
     my $query;
@@ -120,12 +121,19 @@ foreach my $type (@possibleTypes) {
         unless $line =~ /^\s*([^\$]+)\s+\$\s*\s*([\-\d\.\,]+)/;
       my($account, $amount) = ($1, $2);
       $amount = ParseNumber($amount);
-      $funds{$fund}{$type} += $amount;
+      if ($type eq 'Income' and $account =~ /Released/) {
+        $funds{$fund}{'Released Income'} = $ZERO if not defined $funds{$fund}{'Released Income'};
+        $funds{$fund}{'Released Income'} += $amount;
+        $haveReleasedIncome++;
+      } else {
+        $funds{$fund}{$type} += $amount;
+      }
     }
     close LEDGER_INCOME;
     die "Failure on ledger command for ${type}:$fund: $!" unless ($? == 0);
   }
 }
+push(@possibleTypes, 'Released Income') if $haveReleasedIncome > 0;
 
 my %tot;
 ($tot{Start}, $tot{End}) = ($ZERO, $ZERO);
@@ -137,7 +145,7 @@ my %afterEndings;
 
 foreach my $fund (keys %funds) {
   foreach my $type (@possibleTypes) {
-    if ($funds{$fund}{$type} != $ZERO) {
+    if (defined $funds{$fund}{$type} and $funds{$fund}{$type} != $ZERO) {
       if ($type =~ /^(Unearned Income|Accrued)/) {
         $afterEndings{$type} = 1;
       } else {
@@ -165,6 +173,10 @@ my @finalPrints;
 foreach my $type (@beforeEndingFields) {
   $tot{$type} = $ZERO;
   my $formattedType = $type;
+  $formattedType = 'Released From Restriction via Expenses'
+    if ($formattedType eq 'Expenses');
+  $formattedType = 'Released From Restriction to General Fund'
+    if ($formattedType eq 'Released Income');
   print "\"$formattedType\",";
 }
 print '"ENDING BALANCE",""';
@@ -219,7 +231,7 @@ foreach my $fund (sort {
   # Santity check:
   if (abs($funds{$fund}{ending} -
       ($funds{$fund}{starting}
-         - $funds{$fund}{Income} - $funds{$fund}{Expenses}))
+         - $funds{$fund}{Income} - $funds{$fund}{'Released Income'} - $funds{$fund}{Expenses}))
       > $TWO_CENTS) {
     print "$fund FAILED SANITY CHECK: Ending: $funds{$fund}{ending} \n\n\n";
     warn "$fund FAILED SANITY CHECK";
