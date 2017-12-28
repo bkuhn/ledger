@@ -41,7 +41,7 @@ use Math::BigFloat;
 use Date::Manip;
 use File::Temp qw/tempfile/;
 
-my $LEDGER_CMD = "/usr/local/bin/ledger";
+my $LEDGER_CMD = "/usr/bin/ledger";
 
 my $ACCT_WIDTH = 75;
 

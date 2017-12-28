@@ -14,7 +14,7 @@ my $ONE_HUNDRED =  Math::BigFloat->new("100.00");
 my $VERBOSE = 1;
 my $DEBUG = 0;
 
-my $LEDGER_BIN = "/usr/local/bin/ledger";
+my $LEDGER_BIN = "/usr/bin/ledger";
 
 ######################################################################
 sub BruteForceSubSetSumSolver ($$$) {

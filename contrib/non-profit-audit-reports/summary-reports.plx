@@ -29,7 +29,7 @@ use Date::Manip;
 my $VERBOSE = 0;
 my $DEBUG = 0;
 
-my $LEDGER_BIN = "/usr/local/bin/ledger";
+my $LEDGER_BIN = "/usr/bin/ledger";
 
 my $ACCT_WIDTH = 70;
 
@@ -147,7 +147,11 @@ foreach my $item (keys %reportFields) {
     $foundBalance = Math::BigFloat->new($foundBalance);
   }
   $foundBalance = $ZERO if not defined $foundBalance;
-  $reportFields{$item}{total} = abs($foundBalance);
+  if ($item =~  /Assets/) {
+    $reportFields{$item}{total} = 0 - $foundBalance;
+  } else {
+    $reportFields{$item}{total} = abs($foundBalance);
+  }
   print STDERR  "$item: $reportFields{$item}{total}\n" if $VERBOSE;
 }
 
@@ -216,7 +220,7 @@ my %incomeGroups = ('INTEREST INCOME' => { args => ['/^Income.*Interest/' ] },
                     { args => [ '/^Income.*(Royalt|Affilate)/' ] },
                     'CONFERENCES, REGISTRATION' => {args => [ '/^Income.*Reg/' ] },
                     'CONFERENCES, RELATED BUSINESS INCOME' => { args => [ '/^Income.*(Conferences?:.*Sponsor|Booth|RBI)/'] },
-                    'LICENSE COMPLIANCE' => { args => [ '/^Income.*(Enforce|Compliance)/' ]},
+                    'LICENSE COMPLIANCE' => { args => [ '/^Income.*(Enforce|Compliance)/', 'and', 'not', '/Income.*Donations/'  ]},
                     'TRADEMARKS' => {args => [ '/^Income.*Trademark/' ]},
                     'ADVERSITING' => {args => [ '/^Income.*Advertising/' ]});
 
@@ -279,7 +283,7 @@ print INCOME "\n\n\n", sprintf($formatStrTotal, "OVERALL TOTAL:", Commify($overa
 
 close INCOME;    die "unable to write to income.csv: $!" unless ($? == 0);
 
-die "calculated total of $overallTotal does equal $incomeGroups{TOTAL}{total}"
+die "calculated total of $overallTotal does equal $incomeGroups{TOTAL}{total} for all income groups"
   if (abs($overallTotal) - abs($incomeGroups{TOTAL}{total}) > $TWO_CENTS);
 
 print STDERR "\n";
