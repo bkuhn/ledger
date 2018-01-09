@@ -42,10 +42,10 @@ my $ZERO =  Math::BigFloat->new("0.00");
 my $TWO_CENTS =  Math::BigFloat->new("0.02");
 
 if (@ARGV < 2) {
-  print STDERR "usage: $0 <START_DATE> <END_DATE> <LEDGER_OPTIONS>\n";
+  print STDERR "usage: $0 <START_DATE> <END_DATE> <ACCOUNT_REGEX> <LEDGER_OPTIONS>\n";
   exit 1;
 }
-my($startDate, $endDate, @mainLedgerOptions) = @ARGV;
+my($startDate, $endDate, $accountRegex, @mainLedgerOptions) = @ARGV;
 
 my $err;
 my $formattedEndDate = UnixDate(DateCalc(ParseDate($endDate), ParseDateDelta("- 1 day"), \$err),
@@ -64,6 +64,7 @@ my @possibleTypes = ('Accrued:Loans Receivable', 'Accrued:Accounts Payable',
 
 my %data;
 foreach my $type (@possibleTypes) {
+  $type .= '.*' . $accountRegex  if (defined $accountRegex);
   open(LEDGER_FUNDS, "-|", $LEDGER_CMD, @ledgerOptions, "/^$type/")
     or die "Unable to run $LEDGER_CMD @ledgerOptions: $!";
 
