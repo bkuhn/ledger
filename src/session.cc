@@ -152,8 +152,8 @@ std::size_t session_t::read_data(const string& master_account)
       std::ostringstream buffer;
 
       while (std::cin.good() && ! std::cin.eof()) {
-        char line[8192];
-        std::cin.read(line, 8192);
+        char line[65536];
+        std::cin.read(line, 65536);
         std::streamsize count = std::cin.gcount();
         buffer.write(line, count);
       }

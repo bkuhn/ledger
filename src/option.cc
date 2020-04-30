@@ -123,7 +123,7 @@ void process_environment(const char ** envp, const string& tag,
 
   for (const char ** p = envp; *p; p++) {
     if (std::strlen(*p) >= tag_len && std::strncmp(*p, tag_p, tag_len) == 0) {
-      char   buf[8192];
+      char   buf[65536];
       char * r = buf;
       const char * q;
       for (q = *p + tag_len;

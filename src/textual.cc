@@ -1252,7 +1252,7 @@ void instance_t::python_directive(char *)
 
 bool instance_t::general_directive(char * line)
 {
-  char buf[8192];
+  char buf[65536];
 
   std::strcpy(buf, line);
 
